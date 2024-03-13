@@ -3,36 +3,22 @@
   import pako from "pako";
   import toast, { Toaster } from "svelte-french-toast";
 
-  import BsTrash from "svelte-icons-pack/bs/BsTrash";
-  import BsPlus from "svelte-icons-pack/bs/BsPlus";
-
   import { onMount } from "svelte";
-  import Icon from "svelte-icons-pack";
 
   let compressed: string = "";
   let urlList: string[] = [];
+  let urlTexts: string = "";
   let editMode: boolean = false;
 
-  const addItem = () => {
-    urlList = [...urlList, ""];
-    toast.success("Added", {
-      duration: 500,
-    });
+  const handleEditModeChange = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    if (target.checked) {
+      urlTexts = urlList.join("\n");
+    } else {
+      urlList = urlTexts.split(/\s+/).map((url) => url.trim()).filter((url) => url !== "");
+      compressed = compressList();
+    }
   };
-
-  const removeItemAt = (i: number) => {
-    urlList = urlList.filter((_, j) => i !== j);
-    toast.success("Removed", {
-      duration: 500,
-    });
-  };
-
-  $: if (!editMode) {
-    // Filter urlList to remove empty strings
-    urlList = urlList.map((url) => url.trim()).filter((url) => url !== "");
-    // Compress into base64
-    compressed = compressList();
-  }
 
   $: thisURL = (() => {
     // Get current protocol + host + path
@@ -155,36 +141,23 @@
 <header class="container">
   <hgroup>
     <h1>Share URLs</h1>
-  </hgroup>
-
-  <fieldset>
     <label>
       <input
         name="terms"
         type="checkbox"
         role="switch"
+        on:change={handleEditModeChange}
         bind:checked={editMode}
       />
-      Edit Mode
+      Edit
     </label>
-  </fieldset>
 </header>
 
 <main class="container">
   {#if editMode}
-    {#each urlList as url, i}
-      <fieldset role="group">
-        <input type="text" bind:value={url} />
-        <button on:click={() => removeItemAt(i)}>
-          <Icon src={BsTrash} />
-        </button>
-      </fieldset>
-    {/each}
-    <button class="w-100" on:click={addItem}>
-      <Icon src={BsPlus} />
-      Add
-    </button>
+    <textarea bind:value={urlTexts} rows="20"/>
   {:else}
+    <div class="padding" />
     {#each urlList as url, i}
       <div class="linked-box-wrap">
         <a class="linked-box" href={url}>
@@ -193,28 +166,38 @@
             src={"https://www.google.com/s2/favicons?sz=256&sz=128&sz=64&sz=32&domain=" +
               url}
           />
-          {url}
+          {url.replace(/^(https?:\/\/)?(www\.)?/, "")}
         </a>
       </div>
     {/each}
 
     <hr />
 
-    To share, copy the below URL:<br />
-    <a href={thisURL} target="_blank" rel="noopener">
-      {thisURL}
-    </a>
+    <small>
+      To share, copy the below URL:<br />
+      <a href={thisURL} target="_blank" rel="noopener">
+        {thisURL}
+      </a>
+    </small>
   {/if}
 </main>
 
 <style>
+  div.padding {
+    height: 35dvh;
+  }
+
+  a {
+    word-wrap: break-word;
+    word-break: break-all;
+  }
   .w-100 {
     width: 100%;
   }
 
   div.linked-box-wrap {
     display: inline-block;
-    width: 25%;
+    width: 33%;
     padding: 0.5rem;
   }
 
