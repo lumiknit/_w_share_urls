@@ -185,7 +185,7 @@
 
 <style>
   div.padding {
-    height: 35dvh;
+    height: 35svh;
   }
 
   a {
