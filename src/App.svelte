@@ -111,6 +111,7 @@
 
   const parseData = (d: string) => {
     // Convert given d from base64 to Uint8Array
+    d = d.replace(/-/g, "+").replace(/_/g, "/");
     const bytes = atob(d);
     const uint8Array = new Uint8Array(bytes.length);
     for (let i = 0; i < bytes.length; i++) {
