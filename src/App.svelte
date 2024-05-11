@@ -15,7 +15,10 @@
     if (target.checked) {
       urlTexts = urlList.join("\n");
     } else {
-      urlList = urlTexts.split(/\s+/).map((url) => url.trim()).filter((url) => url !== "");
+      urlList = urlTexts
+        .split(/\s+/)
+        .map((url) => url.trim())
+        .filter((url) => url !== "");
       compressed = compressList();
     }
   };
@@ -32,18 +35,6 @@
     window.history.pushState({}, "", newURL);
     return newURL;
   })();
-
-  window.onpopstate = () => {
-    // Get 'd' query param
-    const urlParams = new URLSearchParams(window.location.search);
-    const d = urlParams.get("d");
-    if (d !== null) {
-      compressed = d;
-      parseData(compressed);
-    } else {
-      urlList = [];
-    }
-  };
 
   // URL Modifier
   const splitProtocolAndURL = (url: string) => {
@@ -163,11 +154,12 @@
       />
       Edit
     </label>
+  </hgroup>
 </header>
 
 <main class="container">
   {#if editMode}
-    <textarea bind:value={urlTexts} rows="20"/>
+    <textarea bind:value={urlTexts} rows="20" />
   {:else}
     <div class="padding" />
     {#each urlList as url, i}
