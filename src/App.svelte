@@ -9,6 +9,7 @@
   let urlList: string[] = [];
   let urlTexts: string = "";
   let editMode: boolean = false;
+  let editted: boolean = false;
 
   const handleEditModeChange = (e: Event) => {
     const target = e.target as HTMLInputElement;
@@ -20,6 +21,7 @@
         .map((url) => url.trim())
         .filter((url) => url !== "");
       compressed = compressList();
+      editted = true;
     }
   };
 
@@ -32,9 +34,21 @@
       window.location.pathname;
     // Add query param 'd'
     const newURL = compressed !== "" ? url + "?d=" + compressed : url;
-    window.history.pushState({}, "", newURL);
+    if(editted) window.history.pushState({}, "", newURL);
     return newURL;
   })();
+
+  window.onpopstate = () => {
+    // Get 'd' query param
+    const urlParams = new URLSearchParams(window.location.search);
+    const d = urlParams.get("d");
+    if (d !== null) {
+      compressed = d;
+      parseData(compressed);
+    } else {
+      urlList = [];
+    }
+  };
 
   // URL Modifier
   const splitProtocolAndURL = (url: string) => {
