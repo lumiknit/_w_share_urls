@@ -28,11 +28,22 @@
       window.location.host +
       window.location.pathname;
     // Add query param 'd'
-    if (compressed !== "") {
-      return url + "?d=" + compressed;
-    }
-    return url;
+    const newURL = compressed !== "" ? url + "?d=" + compressed : url;
+    window.history.pushState({}, "", newURL);
+    return newURL;
   })();
+
+  window.onpopstate = () => {
+    // Get 'd' query param
+    const urlParams = new URLSearchParams(window.location.search);
+    const d = urlParams.get("d");
+    if (d !== null) {
+      compressed = d;
+      parseData(compressed);
+    } else {
+      urlList = [];
+    }
+  };
 
   // URL Modifier
   const splitProtocolAndURL = (url: string) => {
@@ -191,9 +202,6 @@
   a {
     word-wrap: break-word;
     word-break: break-all;
-  }
-  .w-100 {
-    width: 100%;
   }
 
   div.linked-box-wrap {
