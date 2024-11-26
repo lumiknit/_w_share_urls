@@ -114,7 +114,9 @@
     const data = urls.join("\n");
 
     // Compress with gzip
-    const deflated = pako.deflateRaw(data);
+    const deflated = pako.deflateRaw(data, {
+      level: 9,
+    });
 
     // Convert to base64
     let base64 = btoa(String.fromCharCode(...new Uint8Array(deflated)));
